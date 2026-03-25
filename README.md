@@ -41,7 +41,11 @@ e:/python_space/vba_codes/
 
 ### 3. 让 AI 帮你修改代码
 
-直接告诉 AI 你的需求，AI 会：
+直接告诉 AI 你的需求。最好显示的调用skill，例如：
+```
+调用技能excel-vba-editor，修改 @ 中的VBA代码
+```
+然后，AI 会：
 1. 查看当前的 VBA 代码
 2. 进行修改
 3. 将修改后的代码写回 Excel
