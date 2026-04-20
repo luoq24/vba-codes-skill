@@ -23,11 +23,7 @@ e:/python_space/vba_codes/
 
 ## 如何使用
 
-### 1. 放置 Excel 文件
-
-将你的 `.xlsm` 文件放在项目根目录下。
-
-### 2. 查看 VBA 代码变更
+### 1. 查看 VBA 代码变更
 
 所有 VBA 代码都会导出到 `vba_src/` 目录下：
 
@@ -39,7 +35,7 @@ e:/python_space/vba_codes/
 2. 在左侧 Git 面板查看修改内容
 3. 或使用 `git diff` 命令查看差异
 
-### 3. 让 AI 帮你修改代码
+### 2. 让 AI 帮你修改代码
 
 直接告诉 AI 你的需求。最好显示的调用skill，例如：
 ```
