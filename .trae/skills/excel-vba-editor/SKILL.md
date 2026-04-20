@@ -38,19 +38,21 @@ description: "使用 xlwings 直接编辑已打开的 Excel .xlsm 文件中的 V
 
 ```bash
 # 1. 分析任务，确定需要修改的模块
-python scripts\list_modules.py "workbook.xlsm"
+python .trae\skills\excel-vba-editor\scripts\list_modules.py "workbook.xlsm"
 
 # 2. 导出需要修改的模块代码到 vba_src/（作为对比基线）
-python scripts\export_vba.py "workbook.xlsm" "ModuleName"
+python .trae\skills\excel-vba-editor\scripts\export_vba.py "workbook.xlsm" "ModuleName"
 
-# 3. Git commit 保存原始代码快照
-scripts\git_auto_commit.bat "workbook.xlsm" "[excel-vba-editor]导出原始代码"
+# 3. Git commit 保存原始代码快照（必做！）
+# PowerShell 或 CMD 通用命令：
+git add "vba_src/workbook/"
+git commit -m "[excel-vba-editor]导出原始代码 - ModuleName"
 
 # 4. 【关键】直接在Excel中编辑VBA代码
 #    AI使用 modify_module.py / modify_method.py 等脚本直接修改工作簿
 
 # 5. 编辑完成后，再次导出查看修改内容
-python scripts\export_vba.py "workbook.xlsm" "ModuleName"
+python .trae\skills\excel-vba-editor\scripts\export_vba.py "workbook.xlsm" "ModuleName"
 
 # 6. 使用Git diff查看修改差异
 git diff vba_src/
@@ -60,12 +62,22 @@ git diff vba_src/
 
 1. **分析修改范围**：明确本次任务需要修改哪些模块
 2. **导出代码（基线）**：导出原始代码到 `vba_src/`，仅用于后续对比差异
-3. **Git 提交**：提交原始代码快照，建立对比基线
+3. **Git 提交**：**必须立即执行**！提交原始代码快照，建立对比基线
 4. **直接编辑**：AI使用脚本直接在Excel工作簿中修改VBA代码，**不编辑导出的文件**
 5. **再导出（对比）**：编辑完成后再次导出，用于查看实际修改内容
 6. **查看差异**：使用 `git diff` 对比两次导出的差异，确认修改内容
 
 **核心原则**：导出的文件仅用于Git差异对比，实际编辑直接在Excel中进行。
+
+**⚠️ Git Commit 强制要求**：
+- 在导出代码后、编辑代码前，必须执行 Git commit 保存原始代码快照
+- 这是后续对比修改差异的唯一基线，不可省略
+- 如果跳过此步骤，将无法准确查看代码变更内容
+- PowerShell/CMD 通用命令示例：
+  ```bash
+  git add "vba_src/工作簿名称/"
+  git commit -m "[excel-vba-editor]导出原始代码 - 模块名"
+  ```
 
 ## ⚠️ 重要提示
 
