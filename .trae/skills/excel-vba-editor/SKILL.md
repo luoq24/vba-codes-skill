@@ -20,6 +20,8 @@ description: "使用 xlwings 直接编辑已打开的 Excel .xlsm 文件中的 V
 2. 已安装 xlwings：`pip install xlwings`
 3. Excel 中启用"信任对 VBA 项目对象模型的访问"（信任中心 > 宏设置）
 
+>若不满足以上条件，直接告知用户，不要自己解决。
+
 ## 推荐工作流（直接编辑模式）
 
 ```
