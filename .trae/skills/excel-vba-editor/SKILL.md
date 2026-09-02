@@ -46,9 +46,12 @@ python .trae\skills\excel-vba-editor\scripts\list_modules.py "workbook.xlsm"
 python .trae\skills\excel-vba-editor\scripts\export_vba.py "workbook.xlsm" "ModuleName"
 
 # 3. Git commit 保存原始代码快照（必做！）
-# PowerShell 或 CMD 通用命令：
-git add "vba_src/workbook/"
+#    在 vba_src 子仓库内提交。vba_src 是独立本地仓库（无远程），
+#    提交不会进入主仓库，也不会推送到远程。
+cd vba_src
+git add .
 git commit -m "[excel-vba-editor]导出原始代码 - ModuleName"
+cd ..
 
 # 4. 【关键】直接在Excel中编辑VBA代码
 #    AI使用 modify_module.py / modify_method.py 等脚本直接修改工作簿
@@ -56,8 +59,10 @@ git commit -m "[excel-vba-editor]导出原始代码 - ModuleName"
 # 5. 编辑完成后，再次导出查看修改内容
 python .trae\skills\excel-vba-editor\scripts\export_vba.py "workbook.xlsm" "ModuleName"
 
-# 6. 使用Git diff查看修改差异
-git diff vba_src/
+# 6. 使用Git diff查看修改差异（在 vba_src 子仓库内）
+cd vba_src
+git diff
+cd ..
 ```
 
 ### 工作流说明
@@ -75,11 +80,15 @@ git diff vba_src/
 - 在导出代码后、编辑代码前，必须执行 Git commit 保存原始代码快照
 - 这是后续对比修改差异的唯一基线，不可省略
 - 如果跳过此步骤，将无法准确查看代码变更内容
-- PowerShell/CMD 通用命令示例：
+- PowerShell/CMD 通用命令示例（**在 vba_src 子仓库内执行**）：
   ```bash
-  git add "vba_src/工作簿名称/"
+  cd vba_src
+  git add .
   git commit -m "[excel-vba-editor]导出原始代码 - 模块名"
+  cd ..
   ```
+
+**vba_src 是独立本地子仓库**：所有导出与对比用的临时提交都发生在 `vba_src/`（无远程仓库），不会进入主仓库、不会推送远程。任务结束后，用户可运行根目录的 `reset_vba_src.bat` 一键清空重置该子仓库。
 
 ## ⚠️ 重要提示
 

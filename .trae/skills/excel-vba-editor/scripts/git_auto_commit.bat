@@ -1,113 +1,121 @@
 @echo off
-chcp 65001 >nul
-title VBA Git è‡ªåŠ¨æäº¤å·¥å…·
+setlocal
+title VBA Git ×Ô¶¯Ìá½»¹¤¾ß£¨±¾µØ vba_src ×Ó²Ö¿â£©
 
-:: VBA Git è‡ªåŠ¨æäº¤è„šæœ¬
-:: å·¥ä½œæµ: åˆ†æä¿®æ”¹èŒƒå›´ -> å¯¼å‡ºæ¨¡å— -> Git commit -> AIä¿®æ”¹ -> å†™å›Excel
-:: ç”¨æ³•: git_auto_commit.bat [å·¥ä½œç°¿åç§°] [æäº¤ä¿¡æ¯]
-:: ç¤ºä¾‹: git_auto_commit.bat "svnè·¨åˆ†æ”¯åˆè¡¨å·¥å…·.xlsm" "å¯¼å‡ºåŸå§‹ä»£ç "
+:: ÓÃÍ¾£ºµ¼³ö Excel ÖĞÖ¸¶¨¹¤×÷²¾µÄ VBA ´úÂëµ½ vba_src ×Ó²Ö¿â²¢Ìá½»¡£
 ::
-:: æ³¨æ„ï¼šæ­¤è„šæœ¬æ‰§è¡Œç¬¬3æ­¥ï¼ˆGit commitï¼‰ï¼Œå‰ææ˜¯å·²å®Œæˆï¼š
-::   ç¬¬1æ­¥: åˆ†æä»»åŠ¡ï¼Œç¡®å®šéœ€è¦ä¿®æ”¹çš„æ¨¡å—
-::   ç¬¬2æ­¥: ä½¿ç”¨ export_vba.py å¯¼å‡ºæ¨¡å—åˆ° vba_src/
+:: vba_src ÊÇ¶ÀÁ¢µÄ±¾µØ Git ×Ó²Ö¿â£¨ÎŞÔ¶³Ì²Ö¿â£©£¬Ìá½»Ö»·¢ÉúÔÚ±¾µØ£¬
+:: ²»»á½øÈëÖ÷²Ö¿â£¬Ò²²»»áÍÆËÍµ½Ô¶³Ì¡£ÈÎÎñ½áÊøºó¿ÉÔËĞĞ
+:: reset_vba_src.bat Ò»¼üÇå¿ÕÖØÖÃ¡£
+::
+:: ÓÃ·¨: git_auto_commit.bat [¹¤×÷²¾Ãû³Æ] [Ìá½»ĞÅÏ¢]
+:: Ê¾Àı: git_auto_commit.bat "svn¿ç·ÖÖ§ºÏ±í¹¤¾ß.xlsm" "µ¼³öÔ­Ê¼´úÂë"
+::
+:: Ç°Ìá: ÒÑÍê³ÉµÚ2²½ export_vba.py µ¼³öÄ£¿éµ½ vba_src/
 
-setlocal enabledelayedexpansion
-
-:: è®¾ç½® Python è§£é‡Šå™¨è·¯å¾„ï¼ˆä½¿ç”¨è™šæ‹Ÿç¯å¢ƒï¼‰
 set "PYTHON_EXE=e:\python_space\.venv_work\Scripts\python.exe"
 set "SCRIPTS_DIR=%~dp0"
 set "PROJECT_ROOT=%SCRIPTS_DIR%..\..\..\.."
+set "VBA_SRC=%PROJECT_ROOT%\vba_src"
 
-:: è§£æå‚æ•°
-if "%~1"=="" (
-    set /p BOOK_NAME="è¯·è¾“å…¥å·¥ä½œç°¿åç§° (ä¾‹å¦‚: svnè·¨åˆ†æ”¯åˆè¡¨å·¥å…·.xlsm): "
-) else (
-    set "BOOK_NAME=%~1"
-)
+:: ½âÎö²ÎÊı£º¹¤×÷²¾Ãû³Æ
+if not "%~1"=="" goto :book_ok
+set /p BOOK_NAME="ÇëÊäÈë¹¤×÷²¾Ãû³Æ (ÀıÈç: svn¿ç·ÖÖ§ºÏ±í¹¤¾ß.xlsm): "
+goto :parse_msg
 
-if "%~2"=="" (
-    set "COMMIT_MSG=è‡ªåŠ¨å¯¼å‡º VBA ä»£ç  - %date% %time%"
-) else (
-    set "COMMIT_MSG=%~2"
-)
+:book_ok
+set "BOOK_NAME=%~1"
 
+:parse_msg
+:: ½âÎö²ÎÊı£ºÌá½»ĞÅÏ¢
+if not "%~2"=="" goto :msg_set
+set "COMMIT_MSG=×Ô¶¯µ¼³ö VBA ´úÂë - %date% %time%"
+goto :begin
+
+:msg_set
+set "COMMIT_MSG=%~2"
+
+:begin
 echo ========================================
-echo    VBA Git è‡ªåŠ¨æäº¤å·¥å…·
+echo   VBA Git ×Ô¶¯Ìá½»¹¤¾ß£¨±¾µØ vba_src ×Ó²Ö¿â£©
 echo ========================================
 echo.
-echo å·¥ä½œç°¿: %BOOK_NAME%
-echo æäº¤ä¿¡æ¯: %COMMIT_MSG%
+echo ¹¤×÷²¾: %BOOK_NAME%
+echo Ìá½»ĞÅÏ¢: %COMMIT_MSG%
 echo.
 
-:: æ£€æŸ¥ Python è§£é‡Šå™¨
-if not exist "%PYTHON_EXE%" (
-    echo [é”™è¯¯] æœªæ‰¾åˆ° Python è§£é‡Šå™¨: %PYTHON_EXE%
-    echo è¯·æ£€æŸ¥è™šæ‹Ÿç¯å¢ƒè·¯å¾„æ˜¯å¦æ­£ç¡®ã€‚
-    pause
-    exit /b 1
-)
+:: ¼ì²é Python ½âÊÍÆ÷
+if exist "%PYTHON_EXE%" goto :check_script
+echo [´íÎó] Î´ÕÒµ½ Python ½âÊÍÆ÷: %PYTHON_EXE%
+echo Çë¼ì²éĞéÄâ»·¾³Â·¾¶ÊÇ·ñÕıÈ·¡£
+pause
+exit /b 1
 
-:: æ£€æŸ¥ export_vba.py æ˜¯å¦å­˜åœ¨
-if not exist "%SCRIPTS_DIR%export_vba.py" (
-    echo [é”™è¯¯] æœªæ‰¾åˆ° export_vba.py è„šæœ¬
-    pause
-    exit /b 1
-)
+:check_script
+:: ¼ì²é export_vba.py ÊÇ·ñ´æÔÚ
+if exist "%SCRIPTS_DIR%export_vba.py" goto :do_export
+echo [´íÎó] Î´ÕÒµ½ export_vba.py ½Å±¾
+pause
+exit /b 1
 
-echo [1/3] æ­£åœ¨å¯¼å‡º VBA ä»£ç ...
+:do_export
+echo [1/3] ÕıÔÚµ¼³ö VBA ´úÂë...
 echo.
-
-:: å¯¼å‡º VBA ä»£ç 
 cd /d "%PROJECT_ROOT%"
 "%PYTHON_EXE%" "%SCRIPTS_DIR%export_vba.py" "%BOOK_NAME%"
-
-if %errorlevel% neq 0 (
-    echo.
-    echo [é”™è¯¯] å¯¼å‡º VBA ä»£ç å¤±è´¥
-    pause
-    exit /b 1
-)
-
+if %errorlevel% equ 0 goto :prepare_repo
 echo.
-echo [2/3] æ­£åœ¨æ·»åŠ åˆ° Git...
-echo.
-
-:: æ£€æŸ¥æ˜¯å¦æ˜¯ Git ä»“åº“
-if not exist "%PROJECT_ROOT%\.git" (
-    echo [åˆå§‹åŒ–] åˆ›å»º Git ä»“åº“...
-    cd /d "%PROJECT_ROOT%"
-    git init
-    echo.
-)
-
-:: æ·»åŠ æ‰€æœ‰ vba_src/ ç›®å½•ä¸‹çš„æ›´æ”¹
-cd /d "%PROJECT_ROOT%"
-git add vba_src/
-
-echo.
-echo [3/3] æ­£åœ¨æäº¤...
-echo.
-
-:: æäº¤æ›´æ”¹
-git commit -m "%COMMIT_MSG%"
-
-if %errorlevel% equ 0 (
-    echo.
-    echo ========================================
-    echo    æäº¤æˆåŠŸï¼
-    echo ========================================
-    echo.
-    echo å·²å¯¼å‡ºå¹¶æäº¤ VBA ä»£ç ã€‚
-    echo ç°åœ¨å¯ä»¥è®© AI ä¿®æ”¹ä»£ç äº†ã€‚
-    echo.
-    echo æŸ¥çœ‹ä¿®æ”¹:
-    echo   git diff HEAD~1    (æŸ¥çœ‹ä¸Šæ¬¡æäº¤çš„å·®å¼‚)
-    echo   git log --oneline  (æŸ¥çœ‹æäº¤å†å²)
-    echo.
-) else (
-    echo.
-    echo [æç¤º] æ²¡æœ‰æ–°çš„æ›´æ”¹éœ€è¦æäº¤
-    echo.
-)
-
+echo [´íÎó] µ¼³ö VBA ´úÂëÊ§°Ü
 pause
+exit /b 1
+
+:prepare_repo
+echo.
+echo [2/3] ¼ì²é vba_src ×Ó²Ö¿â...
+:: vba_src ÉĞÎ´³õÊ¼»¯Îª Git ²Ö¿âÊ±×Ô¶¯³õÊ¼»¯£¨±¾µØ²Ö¿â£¬ÎŞÔ¶³Ì£©
+if exist "%VBA_SRC%\.git" goto :do_commit
+if not exist "%VBA_SRC%" mkdir "%VBA_SRC%"
+cd /d "%VBA_SRC%"
+git init -b main >nul 2>&1
+if %errorlevel% neq 0 goto :init_failed
+if not exist "%VBA_SRC%\vba_codes_will_export_here.txt" type nul > "%VBA_SRC%\vba_codes_will_export_here.txt"
+git add .
+git commit -m "init: vba_src local sub repo" >nul 2>&1
+echo   ÒÑ×Ô¶¯³õÊ¼»¯ vba_src ×Ó²Ö¿â¡£
+
+:do_commit
+echo.
+echo [3/3] ÕıÔÚÌá½»µ½ vba_src ×Ó²Ö¿â...
+echo.
+cd /d "%VBA_SRC%"
+git add .
+git commit -m "%COMMIT_MSG%"
+if %errorlevel% equ 0 goto :commit_ok
+echo.
+echo [ÌáÊ¾] Ã»ÓĞĞÂµÄ¸ü¸ÄĞèÒªÌá½»¡£
+goto :finish
+
+:commit_ok
+echo.
+echo ========================================
+echo    Ìá½»³É¹¦£¡
+echo ========================================
+echo.
+echo ÒÑµ¼³ö²¢Ìá½»µ½±¾µØ vba_src ×Ó²Ö¿â£¨ÎŞÔ¶³Ì²Ö¿â£©¡£
+echo ÏÖÔÚ¿ÉÒÔÈÃ AI ĞŞ¸Ä´úÂëÁË¡£
+echo.
+echo ²é¿´ĞŞ¸Ä£¨ĞèÏÈ cd ½øÈë vba_src Ä¿Â¼£©:
+echo   git diff HEAD~1    (²é¿´ÉÏ´ÎÌá½»µÄ²îÒì)
+echo   git log --oneline  (²é¿´Ìá½»ÀúÊ·)
+echo.
+
+:finish
+echo ÌáÊ¾: ±¾´ÎÈÎÎñ½áÊøºó£¬ÔËĞĞ reset_vba_src.bat ¿ÉÒ»¼üÇå¿ÕÖØÖÃ vba_src¡£
+echo.
+pause
+exit /b 0
+
+:init_failed
+echo [´íÎó] vba_src ×Ó²Ö¿â³õÊ¼»¯Ê§°Ü£¬ÇëÈ·ÈÏ Git ÒÑ°²×°²¢¼ÓÈë PATH¡£
+pause
+exit /b 1

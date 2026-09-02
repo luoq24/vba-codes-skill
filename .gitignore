@@ -49,6 +49,10 @@ env/
 tmp/
 temp/
 
+# vba_src/ 为独立本地子仓库（无远程），仅用于 VBA 导出代码的临时差异对比
+# 不入主仓库版本控制，不推送远程；任务结束后由 reset_vba_src.bat 清空重置
+/vba_src/
+
 # 日志文件
 *.log
 
